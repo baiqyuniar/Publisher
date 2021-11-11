@@ -2,8 +2,9 @@ from __future__ import print_function
 from random import randint
 from time import sleep
 import paho.mqtt.client as mqtt
+from decouple import config
 
-mqttBroker ="192.168.43.57"
+mqttBroker = config('ADDRESS')
 client = mqtt.Client("Speck Publisher")
 client.connect(mqttBroker)
 
