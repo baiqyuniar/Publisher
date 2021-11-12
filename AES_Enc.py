@@ -4,8 +4,10 @@ from random import randint
 from time import sleep
 import paho.mqtt.client as mqtt
 
+from decouple import config
+
 #MQTT
-mqttBroker = "192.168.43.57"
+mqttBroker = config('ADDRESS')
 client = mqtt.Client("AES Publisher")
 client.connect(mqttBroker)
 
@@ -37,7 +39,7 @@ if __name__ == "__main__":
     password = add_to_16(Password)
     while True:
         for _ in range(100):
-            mess = randint(60,100)
+            mess = add_to_16(str(randint(60, 100)))
             print('Pesan yang dikirim\t:', mess)
             encrypted = encrypt(str(mess), password)
             print ('Encrypted\t\t:', encrypted)
