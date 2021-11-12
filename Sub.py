@@ -1,10 +1,12 @@
 import paho.mqtt.client as mqtt
 import time
+from decouple import config
 
 def on_message(client, userdata, message):
     print('received message: ', str(message.payload.decode("utf-8")))
 
-mqttBroker = "192.168.1.7"
+
+mqttBroker = config('ADDRESS')
 
 client = mqtt.Client("Subscriber")
 client.connect(mqttBroker)
