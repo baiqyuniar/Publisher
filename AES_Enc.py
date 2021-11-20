@@ -1,49 +1,107 @@
-from Cryptodome.Cipher import AES
+from operator import truediv
+import Cryptodome.Cipher.AES
+import Cryptodome.Random
+import base64
 import binascii
 from random import randint
 from time import sleep
 import paho.mqtt.client as mqtt
 
-from decouple import config
-
-#MQTT
-mqttBroker = config('ADDRESS')
-client = mqtt.Client("AES Publisher")
+# MQTT
+mqttBroker = "192.168.8.166"
+client = mqtt.Client('AES Publisher')
 client.connect(mqttBroker)
 
-def add_to_16(text):
-    while len(text) % 16 != 0:
-        text += ' '
-    return text
+class Cipher_AES:
+	pad_default = lambda x, y: x + (y - len(x) % y) * " ".encode("utf-8")
+	unpad_default = lambda x: x.rstrip()
+	pad_user_defined = lambda x, y, z: x + (y - len(x) % y) * z.encode("utf-8")
+	unpad_user_defined = lambda x, z: x.rstrip(z)
+	pad_pkcs5 = lambda x, y: x + (y - len(x) % y) * chr(y - len(x) % y).encode("utf-8")
+	unpad_pkcs5 = lambda x: x[:-ord(x[-1])]
 
-def encrypt(data, password):
-    if isinstance(password, str):
-        password = password.encode('utf8')
-    bs = AES.block_size
-    pad = lambda s: s + (bs - len(s) % bs) * chr(bs - len(s) % bs)
-    cipher = AES.new(password, AES.MODE_ECB)
-    data = cipher.encrypt(pad(data).encode('utf8'))
-    encrypt_data = binascii.b2a_hex(data) # Output HEX
-    # encrypt_data = base64.b64encode (data) #Climinate Comments, Output Base64 Format
-    return encrypt_data.decode('utf8')
+	def __init__(self, key="abcdefgh12345678", iv=Cryptodome.Random.new().read(Cryptodome.Cipher.AES.block_size)):
+		self.__key = key
+		self.__iv = iv
 
-def decrypt(decrData, password):
-    if isinstance(password, str):
-        password = password.encode('utf8')
-    cipher = AES.new(password, AES.MODE_ECB)
-    plain_text = cipher.decrypt(binascii.a2b_hex(decrData))
-    return plain_text.decode('utf8')
+	def set_key(self, key):
+		self.__key = key
 
-if __name__ == "__main__":
-    Password = input("Password: ")
-    password = add_to_16(Password)
+	def get_key(self):
+		return self.__key
+
+	def set_iv(self, iv):
+		self.__iv = iv
+
+	def get_iv(self):
+		return self.__iv
+
+	def Cipher_MODE_ECB(self):
+		self.__x = Cryptodome.Cipher.AES.new(self.__key.encode("utf-8"), Cryptodome.Cipher.AES.MODE_ECB)
+
+	def Cipher_MODE_CBC(self):
+		self.__x = Cryptodome.Cipher.AES.new(self.__key.encode("utf-8"), Cryptodome.Cipher.AES.MODE_CBC,
+										 self.__iv.encode("utf-8"))
+
+	def encrypt(self, text, cipher_method, pad_method="", code_method=""):
+		if cipher_method.upper() == "MODE_ECB":
+			self.Cipher_MODE_ECB()
+		elif cipher_method.upper() == "MODE_CBC":
+			self.Cipher_MODE_CBC()
+		cipher_text = b"".join([self.__x.encrypt(i) for i in self.text_verify(text.encode("utf-8"), pad_method)])
+		if code_method.lower() == "base64":
+			return base64.encodebytes(cipher_text).decode("utf-8").rstrip()
+		elif code_method.lower() == "hex":
+			return binascii.b2a_hex(cipher_text).decode("utf-8").rstrip()
+		else:
+			return cipher_text.decode("utf-8").rstrip()
+
+	def text_verify(self, text, method):
+		while len(text) > len(self.__key):
+			text_slice = text[:len(self.__key)]
+			text = text[len(self.__key):]
+			yield text_slice
+		else:
+			if len(text) == len(self.__key):
+				yield text
+			else:
+				yield self.pad_method(text, method)
+
+	def pad_method(self, text, method):
+		if method == "":
+			return Cipher_AES.pad_default(text, len(self.__key))
+		elif method == "PKCS5Padding":
+			return Cipher_AES.pad_pkcs5(text, len(self.__key))
+		else:
+			return Cipher_AES.pad_user_defined(text, len(self.__key), method)
+
+def main2(msg, token):
+	st_arr = []
+	dy_arr = []
+	static_str = 'Mu8weQyDvq1HlAzN'
+	for b in bytearray(static_str, "utf-8"):
+		st_arr.append(b)
+
+	token_str = token[-16:]
+	for b in bytearray(token_str, "utf-8"):
+		dy_arr.append(b)
+
+	res_byts = []
+	for bt in bytes(a ^ b for (a, b) in zip(st_arr, dy_arr)):
+		res_byts.append(bt)
+
+	key = bytes(res_byts).decode()
+	iv = key 
+	text = msg
+	cipher_method = "MODE_CBC"
+	pad_method = "PKCS5Padding"
+	code_method = "base64"
+	cipher_text = Cipher_AES(key, iv).encrypt(text, cipher_method, pad_method, code_method)
+	cipher_text = cipher_text.replace('\n', '')
+	print('Just Published "' + cipher_text + '" to topic AES' )
+
+if __name__ == '__main__':
     while True:
         for _ in range(100):
-            mess = add_to_16(str(randint(60, 100)))
-            print('Pesan yang dikirim\t:', mess)
-            encrypted = encrypt(str(mess), password)
-            print ('Encrypted\t\t:', encrypted)
-            print("Just published " + (encrypted) + " to topic AES")
-            client.publish("AES", str(encrypted))
-
+            client.publish("AES", main2(str(randint(60, 100)), "CI6MTU3ODQ4ODYyM30.SAjMKd0chcAWoFwMkfxJ-Z1lWRM9-AeSXuHZiXBTYyo"))
             sleep(3)
