@@ -96,11 +96,13 @@ def main2(msg, token):
 	pad_method = "PKCS5Padding"
 	code_method = "base64"
 	cipher_text = Cipher_AES(key, iv).encrypt(text, cipher_method, pad_method, code_method)
-	cipher_text = cipher_text.replace('\n', '')
-	print('Just Published "' + cipher_text + '" to topic AES' )
+	return cipher_text.replace('\n', '')
+    
 
 if __name__ == '__main__':
     while True:
         for _ in range(100):
-            client.publish("AES", main2(str(randint(60, 100)), "CI6MTU3ODQ4ODYyM30.SAjMKd0chcAWoFwMkfxJ-Z1lWRM9-AeSXuHZiXBTYyo"))
+            message = main2(str(randint(60, 100)), "CI6MTU3ODQ4ODYyM30.SAjMKd0chcAWoFwMkfxJ-Z1lWRM9-AeSXuHZiXBTYyo")
+            print('Just Published "' + message + '" to topic AES' )
+            client.publish("AES", message)
             sleep(3)
