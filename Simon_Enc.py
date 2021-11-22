@@ -3,10 +3,9 @@ from random import randint
 from time import sleep
 from collections import deque
 import paho.mqtt.client as mqtt
-from decouple import config
 
 #MQTT
-mqttBroker = config('ADDRESS')
+mqttBroker = "192.168.8.166"
 client = mqtt.Client("Simon Publisher")
 client.connect(mqttBroker)
 
@@ -261,8 +260,9 @@ class SimonCipher(object):
 
 if __name__ == "__main__":
     while True:
+        key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
+        cipher = SimonCipher(key, 256, 128, 'CBC', 0xF925)
         for _ in range(100):
-            cipher = SimonCipher(0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100, 256, 128, 'ECB')
             mess = int('{:10}'.format(randint (60,100)))
             print("Pesan yang dikirim\t: ", mess)
             g = cipher.encrypt(mess)

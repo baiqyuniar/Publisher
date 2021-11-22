@@ -2,9 +2,8 @@ from __future__ import print_function
 from random import randint
 from time import sleep
 import paho.mqtt.client as mqtt
-from decouple import config
 
-mqttBroker = config('ADDRESS')
+mqttBroker = "192.168.8.166"
 client = mqtt.Client("Speck Publisher")
 client.connect(mqttBroker)
 
@@ -211,8 +210,8 @@ class SpeckCipher(object):
 
 if __name__ == "__main__":
     while True:
+        cipher = SpeckCipher(0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100, 256, 128, 'ECB')
         for _ in range(100):
-            cipher = SpeckCipher(0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100, 256, 128, 'ECB')
             mess = int('{:10}'.format(randint (60,100)))
             g = cipher.encrypt(mess)
             print("Pesan yang dikirim\t: ", mess)
