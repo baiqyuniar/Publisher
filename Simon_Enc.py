@@ -5,7 +5,7 @@ from collections import deque
 import paho.mqtt.client as mqtt
 
 #MQTT
-mqttBroker = "192.168.8.166"
+mqttBroker = "192.168.8.153"
 client = mqtt.Client("Simon Publisher")
 client.connect(mqttBroker)
 
@@ -27,7 +27,7 @@ class SimonCipher(object):
                       96: {96: (52, z2), 144: (54, z3)},
                       128: {128: (68, z2), 192: (69, z3), 256: (72, z4)}}
 
-    __valid_modes = ['ECB', 'CTR', 'CBC', 'PCBC', 'CFB', 'OFB']
+    __valid_modes = ['ECB', 'CBC']
 
     def __init__(self, key, key_size=128, block_size=128, mode='ECB', init=0, counter=0):
         """
@@ -164,15 +164,6 @@ class SimonCipher(object):
         if self.mode == 'ECB':
             b, a = self.encrypt_function(b, a)
 
-        elif self.mode == 'CTR':
-            true_counter = self.iv + self.counter
-            d = (true_counter >> self.word_size) & self.mod_mask
-            c = true_counter & self.mod_mask
-            d, c = self.encrypt_function(d, c)
-            b ^= d
-            a ^= c
-            self.counter += 1
-
         elif self.mode == 'CBC':
             b ^= self.iv_upper
             a ^= self.iv_lower
@@ -181,37 +172,6 @@ class SimonCipher(object):
             self.iv_upper = b
             self.iv_lower = a
             self.iv = (b << self.word_size) + a
-
-        elif self.mode == 'PCBC':
-            f, e = b, a
-            b ^= self.iv_upper
-            a ^= self.iv_lower
-            b, a = self.encrypt_function(b, a)
-            self.iv_upper = b ^ f
-            self.iv_lower = a ^ e
-            self.iv = (self.iv_upper << self.word_size) + self.iv_lower
-
-        elif self.mode == 'CFB':
-            d = self.iv_upper
-            c = self.iv_lower
-            d, c = self.encrypt_function(d, c)
-            b ^= d
-            a ^= c
-
-            self.iv_upper = b
-            self.iv_lower = a
-            self.iv = (b << self.word_size) + a
-
-        elif self.mode == 'OFB':
-            d = self.iv_upper
-            c = self.iv_lower
-            d, c = self.encrypt_function(d, c)
-            self.iv_upper = d
-            self.iv_lower = c
-            self.iv = (d << self.word_size) + c
-
-            b ^= d
-            a ^= c
 
         ciphertext = (b << self.word_size) + a
 
