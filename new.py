@@ -3,14 +3,11 @@ import Cryptodome.Random
 import base64
 import binascii
 from random import randint
-from time import sleep, time
+from time import sleep
 import paho.mqtt.client as mqtt
-import timeit
-from datetime import datetime
-import json
 
 # MQTT
-mqttBroker = "192.168.8.171"
+mqttBroker = "192.168.8.166"
 client = mqtt.Client('AES Publisher')
 client.connect(mqttBroker)
 
@@ -100,26 +97,12 @@ def main2(msg, token):
 	code_method = "base64"
 	cipher_text = Cipher_AES(key, iv).encrypt(text, cipher_method, pad_method, code_method)
 	return cipher_text.replace('\n', '')
+    
 
-def pencatatan(i, waktu):
-    f = open('publish_simon.csv', 'a')
-    f.write("Message ke-" + i + ";" +waktu + "\n")
-
-# Mencatat waktu mulai
-start = timeit.default_timer()
-message ={}
-for i in range(100):
-	rand = str(randint(60, 100))
-	msg = main2(rand, "CI6MTU3ODQ4ODYyM30.SAjMKd0chcAWoFwMkfxJ-Z1lWRM9-AeSXuHZiXBTYyo")
-	now = str(datetime.now())
-	pencatatan(str(i), now)
-	message['cipher'] = msg
-	message['datetime'] = now
-	stringify = json.dumps(message, indent=2)
-	client.publish("AES", stringify)
-	print("Plaintext\t: ", rand)
-	print("Encrypted\t: ", msg)
-	print("Just published a message to topic AES at "+ now)
-stop = timeit.default_timer()
-lama_enkripsi = stop - start
-print("Waktu akumulasi : "+str(lama_enkripsi))
+if __name__ == '__main__':
+    while True:
+        for _ in range(100):
+            message = main2(str(randint(60, 100)), "CI6MTU3ODQ4ODYyM30.SAjMKd0chcAWoFwMkfxJ-Z1lWRM9-AeSXuHZiXBTYyo")
+            print('Just Published "' + message + '" to topic AES' )
+            client.publish("AES", message)
+            sleep(3)
