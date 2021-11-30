@@ -5,9 +5,12 @@ import binascii
 from random import randint
 from time import sleep
 import paho.mqtt.client as mqtt
+import timeit
+from datetime import datetime
+import json
 
 # MQTT
-mqttBroker = "192.168.8.166"
+mqttBroker = "192.168.43.57"
 client = mqtt.Client('AES Publisher')
 client.connect(mqttBroker)
 
@@ -96,13 +99,21 @@ def main2(msg, token):
 	pad_method = "PKCS5Padding"
 	code_method = "base64"
 	cipher_text = Cipher_AES(key, iv).encrypt(text, cipher_method, pad_method, code_method)
+	print('Pesan yang dikirim\t: ',text)
+	print('Encrypted\t\t: ',cipher_text)
+	print('Just Published a messageto topic AES')
 	return cipher_text.replace('\n', '')
-    
 
-if __name__ == '__main__':
-    while True:
-        for _ in range(100):
-            message = main2(str(randint(60, 100)), "CI6MTU3ODQ4ODYyM30.SAjMKd0chcAWoFwMkfxJ-Z1lWRM9-AeSXuHZiXBTYyo")
-            print('Just Published "' + message + '" to topic AES' )
-            client.publish("AES", message)
-            sleep(3)
+
+# Mencatat waktu mulai
+# start = timeit.default_timer()
+# message ={}
+for _ in range(100):
+    aes = main2(str(randint(60, 100)), "CI6MTU3ODQ4ODYyM30.SAjMKd0chcAWoFwMkfxJ-Z1lWRM9-AeSXuHZiXBTYyo")
+	# now = str(datetime.now())
+	# pencatatan(str(i), now)
+	# message['cipher'] = aes
+    # message['datetime'] = now
+    # stringify = json.dumps(message, indent=2)
+    client.publish("AES", aes)
+    # sleep(3)

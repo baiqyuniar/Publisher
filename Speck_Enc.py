@@ -2,8 +2,11 @@ from __future__ import print_function
 from random import randint
 from time import sleep
 import paho.mqtt.client as mqtt
+import timeit
+from datetime import datetime
+import json
 
-mqttBroker = "192.168.8.153"
+mqttBroker = "192.168.43.57"
 client = mqtt.Client("Speck Publisher")
 client.connect(mqttBroker)
 
@@ -169,14 +172,31 @@ class SpeckCipher(object):
                 raise
         return self.iv
 
-if __name__ == "__main__":
-    while True:
-        cipher = SpeckCipher(0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100, 256, 128, 'CBC', 0xff)
-        for _ in range(100):
-            mess = int('{:10}'.format(randint (60,100)))
-            g = cipher.encrypt(mess)
-            print("Pesan yang dikirim\t: ", mess)
-            client.publish("SPECK", g)
-            print("Encrypted\t\t: ", hex(g))
-            print("Just published " + hex(g) + " to topic SPECK")
-            sleep(3)
+def pencatatan(i, waktu):
+    f = open('publish_speck.csv', 'a')
+    f.write("Message ke-" + i + ";" +waktu + "\n")
+
+# Mencatat waktu mulai
+start = timeit.default_timer()
+
+key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
+cipher = SpeckCipher(key, 256, 128, 'CBC', 0xff)
+message ={}
+for i in range(100):
+    mess = int('{:10}'.format(randint (60,100)))
+    print("Pesan yang dikirim\t: ", mess)
+    speck = cipher.encrypt(mess)
+    now = str(datetime.now())
+    pencatatan(str(i), now)
+    message['cipher'] = speck
+    message['datetime'] = now
+    stringify = json.dumps(message, indent=2)
+    client.publish("SPECK", stringify)
+    print("Encrypted\t\t: ", hex(speck))
+    print("Just published a message to topic SIMON at "+ now)
+    # sleep(3)
+
+# Mencatat waktu selesai
+stop = timeit.default_timer()
+lama_enkripsi = stop - start
+print("Waktu akumulasi : "+str(lama_enkripsi))
