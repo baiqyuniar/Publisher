@@ -102,7 +102,7 @@ def main2(msg, token):
 	return cipher_text.replace('\n', '')
 
 def pencatatan(i, waktu):
-    f = open('publish_simon.csv', 'a')
+    f = open('publish_aes.csv', 'a')
     f.write("Message ke-" + i + ";" +waktu + "\n")
 
 # Mencatat waktu mulai
@@ -111,7 +111,7 @@ message ={}
 for i in range(100):
 	rand = str(randint(60, 100))
 	msg = main2(rand, "CI6MTU3ODQ4ODYyM30.SAjMKd0chcAWoFwMkfxJ-Z1lWRM9-AeSXuHZiXBTYyo")
-	now = str(datetime.now())
+	now = str(datetime.now().microsecond)
 	pencatatan(str(i), now)
 	message['cipher'] = msg
 	message['datetime'] = now
