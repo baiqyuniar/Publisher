@@ -8,7 +8,7 @@ from datetime import datetime
 import json
 
 #MQTT
-mqttBroker = "192.168.43.57"
+mqttBroker = "192.168.8.171"
 client = mqtt.Client("Simon Publisher")
 client.connect(mqttBroker)
 
@@ -234,7 +234,7 @@ for i in range(100):
     mess = int('{:10}'.format(randint (60,100)))
     print("Pesan yang dikirim\t: ", mess)
     simon = cipher.encrypt(mess)
-    now = str(datetime.now())
+    now = str(datetime.now().microsecond)
     pencatatan(str(i), now)
     message['cipher'] = simon
     message['datetime'] = now
