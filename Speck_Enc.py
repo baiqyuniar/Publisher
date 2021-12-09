@@ -193,7 +193,7 @@ for i in range(10000):
     stringify = json.dumps(message, indent=2)
     client.publish("SPECK", stringify)
     print("Encrypted\t: ", speck)
-    print("Just published a message to topic SIMON at "+ now)
+    print("Just published a message to topic SPECK at "+ now)
     # sleep(3)
 
 # Mencatat waktu selesai
