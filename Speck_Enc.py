@@ -6,7 +6,7 @@ import timeit
 from datetime import datetime
 import json
 
-mqttBroker = "192.168.8.171"
+mqttBroker = "192.168.1.152"
 client = mqtt.Client("Speck Publisher")
 client.connect(mqttBroker)
 
@@ -173,18 +173,18 @@ class SpeckCipher(object):
         return self.iv
 
 def pencatatan(i, waktu):
-    f = open('publish_speck.csv', 'a')
-    f.write("Message ke-" + i + ";" +waktu + "\n")
+    f = open('publish_Speck.csv', 'a')
+    f.write("Message ke-" + i + ";" + str(mess) + ";" + str(speck) + ";" + waktu + "\n")
 
 # Mencatat waktu mulai
 start = timeit.default_timer()
 
 key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
-cipher = SpeckCipher(key, 256, 128, 'CBC', 0xff)
+cipher = SpeckCipher(key, 128, 128, 'CBC', 0xff)
 message ={}
-for i in range(100):
+for i in range(10000):
     mess = int('{:10}'.format(randint (60,100)))
-    print("Pesan yang dikirim\t: ", mess)
+    print("Plaintext\t: ", mess)
     speck = cipher.encrypt(mess)
     now = str(datetime.now().microsecond)
     pencatatan(str(i), now)
@@ -192,7 +192,7 @@ for i in range(100):
     message['datetime'] = now
     stringify = json.dumps(message, indent=2)
     client.publish("SPECK", stringify)
-    print("Encrypted\t\t: ", hex(speck))
+    print("Encrypted\t: ", speck)
     print("Just published a message to topic SIMON at "+ now)
     # sleep(3)
 

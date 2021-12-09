@@ -10,7 +10,7 @@ from datetime import datetime
 import json
 
 # MQTT
-mqttBroker = "192.168.8.171"
+mqttBroker = "192.168.1.152"
 client = mqtt.Client('AES Publisher')
 client.connect(mqttBroker)
 
@@ -102,13 +102,13 @@ def main2(msg, token):
 	return cipher_text.replace('\n', '')
 
 def pencatatan(i, waktu):
-    f = open('publish_aes.csv', 'a')
-    f.write("Message ke-" + i + ";" +waktu + "\n")
+    f = open('publish_AES.csv', 'a')
+    f.write("Message ke-" + i + ";" + rand + ";" + msg + ";" + waktu + "\n")
 
 # Mencatat waktu mulai
 start = timeit.default_timer()
 message ={}
-for i in range(100):
+for i in range(10000):
 	rand = str(randint(60, 100))
 	msg = main2(rand, "CI6MTU3ODQ4ODYyM30.SAjMKd0chcAWoFwMkfxJ-Z1lWRM9-AeSXuHZiXBTYyo")
 	now = str(datetime.now().microsecond)
