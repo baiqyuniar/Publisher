@@ -234,7 +234,7 @@ for i in range(10000):
     mess = int('{:10}'.format(randint (60,100)))
     print("Plaintext\t: ", mess)
     simon = cipher.encrypt(mess)
-    now = str(datetime.now().microsecond)
+    now = str(datetime.now())
     pencatatan(str(i), now)
     message['cipher'] = simon
     message['datetime'] = now
