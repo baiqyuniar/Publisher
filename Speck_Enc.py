@@ -6,9 +6,9 @@ import timeit
 from datetime import datetime
 import json
 
-mqttBroker = "192.168.43.57"
+mqttBroker = "192.168.1.152"
 client = mqtt.Client("Speck Publisher")
-client.connect(mqttBroker, 1884)
+client.connect(mqttBroker)
 
 class SpeckCipher(object):
     """Speck Block Cipher Object"""
@@ -182,7 +182,7 @@ start = timeit.default_timer()
 key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
 cipher = SpeckCipher(key, 128, 128, 'CBC', 0xff)
 message ={}
-for i in range(100):
+for i in range(10000):
     mess = int('{:10}'.format(randint (60,100)))
     print("Plaintext\t: ", mess)
     speck = cipher.encrypt(mess)
