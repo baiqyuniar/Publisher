@@ -10,9 +10,9 @@ from datetime import datetime
 import json
 
 # MQTT
-mqttBroker = "192.168.1.152"
+mqttBroker = "192.168.43.57"
 client = mqtt.Client('AES Publisher')
-client.connect(mqttBroker)
+client.connect(mqttBroker, 1884)
 
 class Cipher_AES:
 	pad_default = lambda x, y: x + (y - len(x) % y) * " ".encode("utf-8")
@@ -111,7 +111,7 @@ message ={}
 for i in range(10000):
 	rand = str(randint(60, 100))
 	msg = main2(rand, "CI6MTU3ODQ4ODYyM30.SAjMKd0chcAWoFwMkfxJ-Z1lWRM9-AeSXuHZiXBTYyo")
-	now = str(datetime.now())
+	now = str(datetime.now().timestamp())
 	pencatatan(str(i), now)
 	message['cipher'] = msg
 	message['datetime'] = now
