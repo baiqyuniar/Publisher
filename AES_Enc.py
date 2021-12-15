@@ -95,7 +95,7 @@ def main2(msg, token):
 	key = bytes(res_byts).decode()
 	iv = key 
 	text = msg
-	cipher_method = "MODE_CBC"
+	cipher_method = "MODE_ECB"
 	pad_method = "PKCS5Padding"
 	code_method = "base64"
 	cipher_text = Cipher_AES(key, iv).encrypt(text, cipher_method, pad_method, code_method)
