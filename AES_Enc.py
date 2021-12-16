@@ -22,7 +22,7 @@ class Cipher_AES:
 	pad_pkcs5 = lambda x, y: x + (y - len(x) % y) * chr(y - len(x) % y).encode("utf-8")
 	unpad_pkcs5 = lambda x: x[:-ord(x[-1])]
 
-	def __init__(self, key="abcdefgh12345678", iv=Cryptodome.Random.new().read(Cryptodome.Cipher.AES.block_size)):
+	def __init__(self, key, iv):
 		self.__key = key
 		self.__iv = iv
 
@@ -77,22 +77,8 @@ class Cipher_AES:
 		else:
 			return Cipher_AES.pad_user_defined(text, len(self.__key), method)
 
-def main2(msg, token):
-	st_arr = []
-	dy_arr = []
-	static_str = 'Mu8weQyDvq1HlAzN'
-	for b in bytearray(static_str, "utf-8"):
-		st_arr.append(b)
-
-	token_str = token[-16:]
-	for b in bytearray(token_str, "utf-8"):
-		dy_arr.append(b)
-
-	res_byts = []
-	for bt in bytes(a ^ b for (a, b) in zip(st_arr, dy_arr)):
-		res_byts.append(bt)
-
-	key = bytes(res_byts).decode()
+def main2(msg):
+	key = 'Mu8weQyDvq1HlAzN'
 	iv = key 
 	text = msg
 	cipher_method = "MODE_ECB"
@@ -110,7 +96,7 @@ start = timeit.default_timer()
 message ={}
 for i in range(10000):
 	rand = str(randint(60, 100))
-	msg = main2(rand, "CI6MTU3ODQ4ODYyM30.SAjMKd0chcAWoFwMkfxJ-Z1lWRM9-AeSXuHZiXBTYyo")
+	msg = main2(rand)
 	now = str(datetime.now().timestamp())
 	pencatatan(str(i), now)
 	message['cipher'] = msg
