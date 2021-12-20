@@ -78,7 +78,7 @@ class Cipher_AES:
 			return Cipher_AES.pad_user_defined(text, len(self.__key), method)
 
 def main2(msg):
-	key = 'Mu8weQyDvq1HlAzN'
+	key = 'Mu8weQyDvq1HlAzN7fjY026B'
 	iv = key 
 	text = msg
 	cipher_method = "MODE_ECB"
