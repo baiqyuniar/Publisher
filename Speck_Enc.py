@@ -180,7 +180,7 @@ def pencatatan(i, waktu):
 start = timeit.default_timer()
 
 key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
-cipher = SpeckCipher(key, 192, 128, 'ECB')
+cipher = SpeckCipher(key, 256, 128, 'ECB')
 message ={}
 for i in range(10000):
     mess = int('{:10}'.format(randint (60,100)))
