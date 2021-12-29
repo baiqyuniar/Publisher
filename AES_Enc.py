@@ -10,9 +10,15 @@ from datetime import datetime
 import json
 
 # MQTT
+<<<<<<< HEAD
+# mqttBroker = "192.168.1.152"
+# client = mqtt.Client('AES Publisher')
+# client.connect(mqttBroker)
+=======
 mqttBroker = "192.168.1.157"
 client = mqtt.Client('AES Publisher')
 client.connect(mqttBroker)
+>>>>>>> dee56c8a12b4fbac9a65ff2c573498dd7f74d4f1
 
 class Cipher_AES:
 	pad_default = lambda x, y: x + (y - len(x) % y) * " ".encode("utf-8")
@@ -102,9 +108,14 @@ class Cipher_AES:
 			return Cipher_AES.pad_user_defined(text, 16,  method)
 
 def main2(msg):
+<<<<<<< HEAD
+	key = 'Mu8weQyXvq1HlAzN'
+	#key = 'Mu8weQy3vq1HlAzN7fjY026Bjeu768db'
+=======
 	#key = 'Mu8weQyDvq1HlAzN'
 	key = 'Mu8weQyDvq1HlAzN7fjY026B'
 	#key = 'Mu8weQyDvq1HlAzN7fjY026Bjeu768db'
+>>>>>>> dee56c8a12b4fbac9a65ff2c573498dd7f74d4f1
 	iv = 'HIwu5283JGHsi76H'
 	text = msg
 	cipher_method = "MODE_ECB"
@@ -113,25 +124,25 @@ def main2(msg):
 	cipher_text = Cipher_AES(key, iv).encrypt(text, cipher_method, pad_method, code_method)
 	return cipher_text.replace('\n', '')
 
-def pencatatan(i, waktu):
-    f = open('publish_AES.csv', 'a')
-    f.write("Message ke-" + i + ";" + rand + ";" + msg + ";" + waktu + "\n")
+# def pencatatan(i, waktu):
+#     f = open('publish_AES.csv', 'a')
+#     f.write("Message ke-" + i + ";" + rand + ";" + msg + ";" + waktu + "\n")
 
-# Mencatat waktu mulai
-start = timeit.default_timer()
-message ={}
-for i in range(10000):
-	rand = str(randint(60, 100))
-	msg = main2(rand)
-	now = str(datetime.now().timestamp())
-	pencatatan(str(i), now)
-	message['cipher'] = msg
-	message['datetime'] = now
-	stringify = json.dumps(message, indent=2)
-	client.publish("AES", stringify)
-	print("Plaintext\t: ", rand)
-	print("Encrypted\t: ", msg)
-	print("Just published a message to topic AES at "+ now)
-stop = timeit.default_timer()
-lama_enkripsi = stop - start
-print("Waktu akumulasi : "+str(lama_enkripsi))
+# # Mencatat waktu mulai
+# start = timeit.default_timer()
+# message ={}
+# for i in range(10000):
+rand = str(66)
+msg = main2(rand)
+	# now = str(datetime.now().timestamp())
+	# pencatatan(str(i), now)
+	# message['cipher'] = msg
+	# message['datetime'] = now
+	# stringify = json.dumps(message, indent=2)
+	# client.publish("AES", stringify)
+print("Plaintext\t: ", rand)
+print("Encrypted\t: ", msg)
+# 	print("Just published a message to topic AES at "+ now)
+# stop = timeit.default_timer()
+# lama_enkripsi = stop - start
+# print("Waktu akumulasi : "+str(lama_enkripsi))
