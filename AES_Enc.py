@@ -71,6 +71,7 @@ class Cipher_AES:
 #				yield self.pad_method(text, method)
 
 	#text verify for AES-192
+
 	def text_verify(self, text, method):
 		while len(text) > 16:
 			text_slice = text[:16]
@@ -82,13 +83,23 @@ class Cipher_AES:
 			else:
 				yield self.pad_method(text, method)
 
+	#Pad method AES-128 and AES-256
+#	def pad_method(self, text, method):
+#		if method == "":
+#			return Cipher_AES.pad_default(text, len(self.__key))
+#		elif method == "PKCS5Padding":
+#			return Cipher_AES.pad_pkcs5(text, len(self.__key))
+#		else:
+#			return Cipher_AES.pad_user_defined(text, len(self.__key), method)
+
+	#Pad method AES-192
 	def pad_method(self, text, method):
 		if method == "":
-			return Cipher_AES.pad_default(text, len(self.__key))
+			return Cipher_AES.pad_default(text, 16)
 		elif method == "PKCS5Padding":
-			return Cipher_AES.pad_pkcs5(text, len(self.__key))
+			return Cipher_AES.pad_pkcs5(text, 16)
 		else:
-			return Cipher_AES.pad_user_defined(text, len(self.__key), method)
+			return Cipher_AES.pad_user_defined(text, 16,  method)
 
 def main2(msg):
 	#key = 'Mu8weQyDvq1HlAzN'
@@ -96,7 +107,7 @@ def main2(msg):
 	#key = 'Mu8weQyDvq1HlAzN7fjY026Bjeu768db'
 	iv = 'HIwu5283JGHsi76H'
 	text = msg
-	cipher_method = "MODE_ECB"
+	cipher_method = "MODE_CBC"
 	pad_method = "PKCS5Padding"
 	code_method = "base64"
 	cipher_text = Cipher_AES(key, iv).encrypt(text, cipher_method, pad_method, code_method)
@@ -109,7 +120,7 @@ def pencatatan(i, waktu):
 # Mencatat waktu mulai
 start = timeit.default_timer()
 message ={}
-for i in range(100000):
+for i in range(10000):
 	rand = str(randint(60, 100))
 	msg = main2(rand)
 	now = str(datetime.now().timestamp())
