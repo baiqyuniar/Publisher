@@ -10,7 +10,7 @@ from datetime import datetime
 import json
 
 # MQTT
-mqttBroker = "192.168.1.152"
+mqttBroker = "192.168.1.157"
 client = mqtt.Client('AES Publisher')
 client.connect(mqttBroker)
 
@@ -58,13 +58,26 @@ class Cipher_AES:
 		else:
 			return cipher_text.decode("utf-8").rstrip()
 
+	#text verify for AES-128 and AES-256
+#	def text_verify(self, text, method):
+#		while len(text) > len(self.__key):
+#			text_slice = text[:len(self.__key)]
+#			text = text[len(self.__key):]
+#			yield text_slice
+#		else:
+#			if len(text) == len(self.__key):
+#				yield text
+#			else:
+#				yield self.pad_method(text, method)
+
+	#text verify for AES-192
 	def text_verify(self, text, method):
-		while len(text) > len(self.__key):
-			text_slice = text[:len(self.__key)]
-			text = text[len(self.__key):]
+		while len(text) > 16:
+			text_slice = text[:16]
+			text = text[16:]
 			yield text_slice
 		else:
-			if len(text) == len(self.__key):
+			if len(text) == 16:
 				yield text
 			else:
 				yield self.pad_method(text, method)
@@ -78,8 +91,10 @@ class Cipher_AES:
 			return Cipher_AES.pad_user_defined(text, len(self.__key), method)
 
 def main2(msg):
+	#key = 'Mu8weQyDvq1HlAzN'
 	key = 'Mu8weQyDvq1HlAzN7fjY026B'
-	iv = key 
+	#key = 'Mu8weQyDvq1HlAzN7fjY026Bjeu768db'
+	iv = 'HIwu5283JGHsi76H'
 	text = msg
 	cipher_method = "MODE_ECB"
 	pad_method = "PKCS5Padding"
@@ -94,7 +109,7 @@ def pencatatan(i, waktu):
 # Mencatat waktu mulai
 start = timeit.default_timer()
 message ={}
-for i in range(10000):
+for i in range(100000):
 	rand = str(randint(60, 100))
 	msg = main2(rand)
 	now = str(datetime.now().timestamp())
