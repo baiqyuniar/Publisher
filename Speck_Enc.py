@@ -6,7 +6,7 @@ import timeit
 from datetime import datetime
 import json
 
-mqttBroker = "192.168.1.152"
+mqttBroker = "192.168.1.157"
 client = mqtt.Client("Speck Publisher")
 client.connect(mqttBroker)
 
@@ -178,24 +178,27 @@ def pencatatan(i, waktu):
 
 # Mencatat waktu mulai
 start = timeit.default_timer()
+<<<<<<< HEAD
+=======
 
+>>>>>>> 5e16a2c3bd8ca4dbd2e697fd5f553b0b95108268
 #key = 0x1f1e1d1c1b1a19181716151413121110
 #key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
 key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
 cipher = SpeckCipher(key, 256, 128, 'CBC', 0x123456789ABCDEF0)
 message ={}
-for i in range(10000):
+for i in range(100000):
     mess = int('{:10}'.format(randint (60,100)))
-    print("Plaintext\t: ", mess)
+#    print("Plaintext\t: ", mess)
     speck = cipher.encrypt(mess)
     now = str(datetime.now().timestamp())
-    pencatatan(str(i), now)
+#    pencatatan(str(i), now)
     message['cipher'] = speck
     message['datetime'] = now
     stringify = json.dumps(message, indent=2)
     client.publish("SPECK", stringify)
-    print("Encrypted\t: ", speck)
-    print("Just published a message to topic SPECK at "+ now)
+#    print("Encrypted\t: ", speck)
+#    print("Just published a message to topic SPECK at "+ now)
     # sleep(3)
 
 # Mencatat waktu selesai
