@@ -121,7 +121,7 @@ def pencatatan(i, waktu):
 start = timeit.default_timer()
 message ={}
 for i in range(10000):
-	rand = str(66)
+	rand = str(randint(60,100))
 	msg = main2(rand)
 	now = str(datetime.now().timestamp())
 	pencatatan(str(i), now)
