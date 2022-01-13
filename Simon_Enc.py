@@ -3,11 +3,10 @@ from random import randint
 from time import sleep
 from collections import deque
 import paho.mqtt.client as mqtt
-import timeit
 from datetime import datetime
 import json
 
-#MQTT
+# MQTT Initialization
 mqttBroker = "192.168.1.157"
 client = mqtt.Client("Simon Publisher")
 client.connect(mqttBroker)
@@ -137,7 +136,7 @@ class SimonCipher(object):
         :param k: Round Key
         :return: Upper and Lower ciphertext segments
         """
-
+        
         # Generate all circular shifts
         ls_1_x = ((x >> (self.word_size - 1)) + (x << 1)) & self.mod_mask
         ls_8_x = ((x >> (self.word_size - 8)) + (x << 8)) & self.mod_mask
@@ -147,7 +146,6 @@ class SimonCipher(object):
         xor_1 = (ls_1_x & ls_8_x) ^ y
         xor_2 = xor_1 ^ ls_2_x
         new_x = k ^ xor_2
-
         return new_x, x
 
     def encrypt(self, plaintext):
@@ -205,9 +203,9 @@ class SimonCipher(object):
             xor_2 = xor_1 ^ ls_2_x
             y = x
             x = k ^ xor_2
-
         return x, y
 
+    # Method untuk melakukan update IV
     def update_iv(self, new_iv):
         if new_iv:
             try:
@@ -220,32 +218,28 @@ class SimonCipher(object):
                 raise
         return self.iv
 
-#def pencatatan(i, waktu):
-#    f = open('publish_Simon.csv', 'a')
-#    f.write("Message ke-" + i + ";" + str(mess) + ";" + str(simon) + ";" + waktu + "\n")
+# Melakukan pencatatan ke dalam file .csv
+def pencatatan(i, waktu):
+   f = open('publish_Simon.csv', 'a')
+   f.write("Message ke-" + i + ";" + str(mess) + ";" + str(simon) + ";" + waktu + "\n")
 
-# Mencatat waktu mulai
-start = timeit.default_timer()
 #key = 0x1f1e1d1c1b1a19181716151413121110
 #key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
 key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
 cipher = SimonCipher(key, 256, 128, 'CBC', 0x123456789ABCDEF0)
+
 message ={}
 for i in range(100000):
-    mess = int('{:10}'.format(randint (60,100)))
-#    print("Plaintext\t: ", mess)
+    mess = randint (60,100)
     simon = cipher.encrypt(mess)
     now = str(datetime.now().timestamp())
-#    pencatatan(str(i), now)
-    message['cipher'] = simon
-    message['datetime'] = now
-    stringify = json.dumps(message, indent=2)
-    client.publish("SIMON", stringify)
-#    print("Encrypted\t: ", simon)
-#    print("Just published a message to topic SIMON at "+ now)
-    # sleep(1)
 
-# Mencatat waktu selesai
-stop = timeit.default_timer()
-lama_enkripsi = stop - start
-print("Waktu akumulasi : "+str(lama_enkripsi))
+    pencatatan(str(i), now)
+    message['cipher'] = simon                   # Memasukan value simon ke dalam key cipher
+    message['datetime'] = now                   # Memasukan waktu ke dalam key datetime
+    stringify = json.dumps(message, indent=2)   # Mengubah format JSON menjadi string
+    client.publish("SIMON", stringify)          # Publish JSON stringify ke MQTT broker
+    
+    print("Plaintext\t: ", mess)
+    print("Encrypted\t: ", simon)
+    print("Just published a message to topic SIMON at "+ now)
