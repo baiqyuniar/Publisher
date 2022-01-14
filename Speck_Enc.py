@@ -6,6 +6,7 @@ import timeit
 from datetime import datetime
 import json
 
+#MQTT Initialization
 mqttBroker = "192.168.1.157"
 client = mqtt.Client("Speck Publisher")
 client.connect(mqttBroker)

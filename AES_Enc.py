@@ -10,7 +10,7 @@ from datetime import datetime
 import json
 
 # MQTT Initialization
-mqttBroker = "192.168.1.157"
+mqttBroker = "192.168.10.108"
 client = mqtt.Client('AES Publisher')
 client.connect(mqttBroker)
 
