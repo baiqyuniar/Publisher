@@ -10,7 +10,7 @@ from datetime import datetime
 import json
 
 # MQTT
-mqttBroker = "192.168.1.157"
+mqttBroker = "34.101.187.83"
 client = mqtt.Client('AES Publisher')
 client.connect(mqttBroker)
 
@@ -58,20 +58,7 @@ class Cipher_AES:
 		else:
 			return cipher_text.decode("utf-8").rstrip()
 
-	#text verify for AES-128 and AES-256
-#	def text_verify(self, text, method):
-#		while len(text) > len(self.__key):
-#			text_slice = text[:len(self.__key)]
-#			text = text[len(self.__key):]
-#			yield text_slice
-#		else:
-#			if len(text) == len(self.__key):
-#				yield text
-#			else:
-#				yield self.pad_method(text, method)
-
 	#text verify for AES-192
-
 	def text_verify(self, text, method):
 		while len(text) > 16:
 			text_slice = text[:16]
@@ -83,14 +70,6 @@ class Cipher_AES:
 			else:
 				yield self.pad_method(text, method)
 
-	#Pad method AES-128 and AES-256
-#	def pad_method(self, text, method):
-#		if method == "":
-#			return Cipher_AES.pad_default(text, len(self.__key))
-#		elif method == "PKCS5Padding":
-#			return Cipher_AES.pad_pkcs5(text, len(self.__key))
-#		else:
-#			return Cipher_AES.pad_user_defined(text, len(self.__key), method)
 
 	#Pad method AES-192
 	def pad_method(self, text, method):
@@ -102,12 +81,12 @@ class Cipher_AES:
 			return Cipher_AES.pad_user_defined(text, 16,  method)
 
 def main2(msg):
-	#key = 'Mu8weQyDvq1HlAzN'
-	key = 'Mu8weQyDvq1HlAzN7fjY026B'
+	key = 'Mu8weQyDvq1HlAzN'
+	#key = 'Mu8weQyDvq1HlAzN7fjY026B'
 	#key = 'Mu8weQyDvq1HlAzN7fjY026Bjeu768db'
 	iv = 'HIwu5283JGHsi76H'
 	text = msg
-	cipher_method = "MODE_CBC"
+	cipher_method = "MODE_ECB"
 	pad_method = "PKCS5Padding"
 	code_method = "base64"
 	cipher_text = Cipher_AES(key, iv).encrypt(text, cipher_method, pad_method, code_method)
@@ -128,7 +107,7 @@ for i in range(10000):
 	message['cipher'] = msg
 	message['datetime'] = now
 	stringify = json.dumps(message, indent=2)
-	client.publish("AES", stringify)
+	client.publish('AES', stringify)
 	print("Plaintext\t: ", rand)
 	print("Encrypted\t: ", msg)
 	print("Just published a message to topic AES at "+ now)
