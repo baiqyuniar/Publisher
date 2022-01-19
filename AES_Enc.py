@@ -81,8 +81,8 @@ class Cipher_AES:
 			return Cipher_AES.pad_user_defined(text, 16,  method)
 
 def main2(msg):
-	#key = 'Mu8weQyDvq1HlAzN'
-	key = 'Mu8weQyDvq1HlAzN7fjY026B'
+	key = 'Mu8weQyDvq1HlAzN'
+	#key = 'Mu8weQyDvq1HlAzN7fjY026B'
 	#key = 'Mu8weQyDvq1HlAzN7fjY026Bjeu768db'
 	iv = 'HIwu5283JGHsi76H'
 	text = msg
