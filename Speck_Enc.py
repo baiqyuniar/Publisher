@@ -173,31 +173,31 @@ class SpeckCipher(object):
                 raise
         return self.iv
 
-def pencatatan(i, waktu):
-    f = open('publish_Speck.csv', 'a')
-    f.write("Message ke-" + i + ";" + str(mess) + ";" + str(speck) + ";" + waktu + "\n")
+#def pencatatan(i, waktu):
+#    f = open('publish_Speck.csv', 'a')
+#    f.write("Message ke-" + i + ";" + str(mess) + ";" + str(speck) + ";" + waktu + "\n")
 
 # Mencatat waktu mulai
 start = timeit.default_timer()
 
-#key = 0x1f1e1d1c1b1a19181716151413121110
+key = 0x1f1e1d1c1b1a19181716151413121110
 #key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
-key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
-cipher = SpeckCipher(key, 256, 128, 'ECB')
+#key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
+cipher = SpeckCipher(key, 128, 128, 'ECB')
 #cipher = SpeckCipher(key, 256, 128, 'CBC', 0x123456789ABCDEF0)
 message ={}
 for i in range(10000):
     mess = randint (60,100)
-    print("Plaintext\t: ", mess)
+#    print("Plaintext\t: ", mess)
     speck = cipher.encrypt(mess)
-    now = str(datetime.now().timestamp())
-    pencatatan(str(i), now)
+#    now = str(datetime.now().timestamp())
+#    pencatatan(str(i), now)
     message['cipher'] = speck
     message['datetime'] = now
     stringify = json.dumps(message, indent=2)
     client.publish("SPECK", stringify)
-    print("Encrypted\t: ", speck)
-    print("Just published a message to topic SPECK at "+ now)
+#    print("Encrypted\t: ", speck)
+#    print("Just published a message to topic SPECK at "+ now)
 
 
 # Mencatat waktu selesai
