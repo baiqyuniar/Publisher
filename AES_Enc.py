@@ -88,7 +88,7 @@ def main2(msg):
 	text = msg
 	cipher_method = "MODE_ECB"
 	pad_method = "PKCS5Padding"
-	code_method = "base64"
+	code_method = "hex"
 	cipher_text = Cipher_AES(key, iv).encrypt(text, cipher_method, pad_method, code_method)
 	return cipher_text.replace('\n', '')
 
@@ -102,15 +102,15 @@ message ={}
 for i in range(10000):
 	rand = str(randint(60,100))
 	msg = main2(rand)
-#	now = str(datetime.now().timestamp())
+	now = str(datetime.now().timestamp())
 #	pencatatan(str(i), now)
 	message['cipher'] = msg
 	message['datetime'] = now
 	stringify = json.dumps(message, indent=2)
 	client.publish('AES', stringify)
-#	print("Plaintext\t: ", rand)
-#	print("Encrypted\t: ", msg)
-#	print("Just published a message to topic AES at "+ now)
+	print("Plaintext\t: ", rand)
+	print("Encrypted\t: ", msg)
+	print("Just published a message to topic AES at "+ now)
 stop = timeit.default_timer()
 lama_enkripsi = stop - start
 print("Waktu akumulasi : "+str(lama_enkripsi))
