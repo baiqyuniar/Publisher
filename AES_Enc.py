@@ -92,9 +92,9 @@ def main2(msg):
 	cipher_text = Cipher_AES(key, iv).encrypt(text, cipher_method, pad_method, code_method)
 	return cipher_text.replace('\n', '')
 
-#def pencatatan(i, waktu):
-#     f = open('publish_AES.csv', 'a')
-#     f.write("Message ke-" + i + ";" + rand + ";" + msg + ";" + waktu + "\n")
+def pencatatan(i, waktu):
+     f = open('publish_AES.csv', 'a')
+     f.write("Message ke-" + i + ";" + rand + ";" + msg + ";" + waktu + "\n")
 
  # Mencatat waktu mulai
 start = timeit.default_timer()
@@ -103,7 +103,7 @@ for i in range(10000):
 	rand = str(randint(60,100))
 	msg = main2(rand)
 	now = str(datetime.now().timestamp())
-#	pencatatan(str(i), now)
+	pencatatan(str(i), now)
 	message['cipher'] = msg
 	message['datetime'] = now
 	stringify = json.dumps(message, indent=2)
