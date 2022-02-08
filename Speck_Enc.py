@@ -176,7 +176,7 @@ class SpeckCipher(object):
 
 def pencatatan(i, waktu):
     f = open('publish_Speck.csv', 'a')
-    f.write("Message ke-" + i + ";" + str(mess) + ";" + str(speck) + ";" + waktu + "\n")
+    f.write("Message ke-" + i + ";" + str(mess) + ";" + hex(speck) + ";" + waktu + "\n")
 
 # Mencatat waktu mulai
 start = timeit.default_timer()
