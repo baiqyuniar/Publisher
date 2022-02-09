@@ -60,12 +60,12 @@ class Cipher_AES:
 
 	#text verify for AES-192
 	def text_verify(self, text, method):
-		while len(text) > 16:
-			text_slice = text[:16]
-			text = text[16:]
+		while len(text) > 32:
+			text_slice = text[:32]
+			text = text[32:]
 			yield text_slice
 		else:
-			if len(text) == 16:
+			if len(text) == 32:
 				yield text
 			else:
 				yield self.pad_method(text, method)
@@ -74,19 +74,19 @@ class Cipher_AES:
 	#Pad method AES-192
 	def pad_method(self, text, method):
 		if method == "":
-			return Cipher_AES.pad_default(text, 16)
+			return Cipher_AES.pad_default(text, 32)
 		elif method == "PKCS5Padding":
-			return Cipher_AES.pad_pkcs5(text, 16)
+			return Cipher_AES.pad_pkcs5(text, 32)
 		else:
-			return Cipher_AES.pad_user_defined(text, 16,  method)
+			return Cipher_AES.pad_user_defined(text, 32,  method)
 
 def main2(msg):
 #	key = 'Mu8weQyDvq1HlAzN'
-	key = 'Mu8weQyDvq1HlAzN7fjY026B'
-#	key = 'Mu8weQyDvq1HlAzN7fjY026Bjeu768db'
+#	key = 'Mu8weQyDvq1HlAzN7fjY026B'
+	key = 'Mu8weQyDvq1HlAzN7fjY026Bjeu768db'
 	iv = 'HIwu5283JGHsi76H'
 	text = msg
-	cipher_method = "MODE_CBC"
+	cipher_method = "MODE_ECB"
 	pad_method = "PKCS5Padding"
 	code_method = "hex"
 	cipher_text = Cipher_AES(key, iv).encrypt(text, cipher_method, pad_method, code_method)
