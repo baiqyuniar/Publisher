@@ -10,7 +10,7 @@ from datetime import datetime
 import json
 
 # MQTT
-mqttBroker = "192.168.8.171"
+mqttBroker = "34.101.187.83"
 client = mqtt.Client('AES Publisher')
 client.connect(mqttBroker)
 
@@ -22,7 +22,7 @@ class Cipher_AES:
 	pad_pkcs5 = lambda x, y: x + (y - len(x) % y) * chr(y - len(x) % y).encode("utf-8")
 	unpad_pkcs5 = lambda x: x[:-ord(x[-1])]
 
-	def __init__(self, key="abcdefgh12345678", iv=Cryptodome.Random.new().read(Cryptodome.Cipher.AES.block_size)):
+	def __init__(self, key, iv):
 		self.__key = key
 		self.__iv = iv
 
@@ -58,68 +58,83 @@ class Cipher_AES:
 		else:
 			return cipher_text.decode("utf-8").rstrip()
 
+	#text verify for AES-192
 	def text_verify(self, text, method):
-		while len(text) > len(self.__key):
-			text_slice = text[:len(self.__key)]
-			text = text[len(self.__key):]
+		while len(text) > 16:
+			text_slice = text[:16]
+			text = text[16:]
 			yield text_slice
 		else:
-			if len(text) == len(self.__key):
+			if len(text) == 16:
 				yield text
 			else:
 				yield self.pad_method(text, method)
 
+
+	#Pad method AES-192
 	def pad_method(self, text, method):
 		if method == "":
-			return Cipher_AES.pad_default(text, len(self.__key))
+			return Cipher_AES.pad_default(text, 16)
 		elif method == "PKCS5Padding":
-			return Cipher_AES.pad_pkcs5(text, len(self.__key))
+			return Cipher_AES.pad_pkcs5(text, 16)
 		else:
-			return Cipher_AES.pad_user_defined(text, len(self.__key), method)
+			return Cipher_AES.pad_user_defined(text, 16,  method)
 
-def main2(msg, token):
-	st_arr = []
-	dy_arr = []
-	static_str = 'Mu8weQyDvq1HlAzN'
-	for b in bytearray(static_str, "utf-8"):
-		st_arr.append(b)
+def publish(topic, message):
+	client.publish(topic, message)
 
-	token_str = token[-16:]
-	for b in bytearray(token_str, "utf-8"):
-		dy_arr.append(b)
 
-	res_byts = []
-	for bt in bytes(a ^ b for (a, b) in zip(st_arr, dy_arr)):
-		res_byts.append(bt)
+def prints(plaintext, encrypted_message, date_now):
+	print("Plaintext\t: ", plaintext)
+	print("Encrypted\t: ", encrypted_message)
+	print("Length\t\t: ", len(encrypted_message), "Bytes")
+	print("Just published a message to topic AES at "+ date_now)
+	print("\n")
 
-	key = bytes(res_byts).decode()
-	iv = key 
-	text = msg
-	cipher_method = "MODE_CBC"
+
+def main(plaintext):
+	key = 'Mu8weQyDvq1HlAzN'
+#	key = 'Mu8weQyDvq1HlAzN7fjY026B'
+#	key = 'Mu8weQyDvq1HlAzN7fjY026Bjeu768db'
+	iv = 'HIwu5283JGHsi76H'
+	text = plaintext
+	cipher_method = "MODE_ECB"
 	pad_method = "PKCS5Padding"
-	code_method = "base64"
+	code_method = "hex"
 	cipher_text = Cipher_AES(key, iv).encrypt(text, cipher_method, pad_method, code_method)
 	return cipher_text.replace('\n', '')
 
-def pencatatan(i, waktu):
-    f = open('publish_aes.csv', 'a')
-    f.write("Message ke-" + i + ";" +waktu + "\n")
+def pencatatan(i, date_now, plaintext, encrypted_message):
+     f = open('Publish_AES.csv', 'a')
+     f.write("Message ke-" + i + ";" + plaintext + ";" + encrypted_message + ";" + date_now + "\n")
 
-# Mencatat waktu mulai
+# Record the start time
 start = timeit.default_timer()
 message ={}
-for i in range(100):
-	rand = str(randint(60, 100))
-	msg = main2(rand, "CI6MTU3ODQ4ODYyM30.SAjMKd0chcAWoFwMkfxJ-Z1lWRM9-AeSXuHZiXBTYyo")
-	now = str(datetime.now().microsecond)
-	pencatatan(str(i), now)
-	message['cipher'] = msg
-	message['datetime'] = now
+
+for i in range(10):
+	# Creating random integer as plaintext
+	plaintext = str(randint(60,100))
+
+	# Encrypting the plaintext
+	encrypted_message = main(plaintext)
+	date_now = str(datetime.now().timestamp())
+
+	# Make the data record
+	pencatatan(str(i), date_now, plaintext, encrypted_message)
+
+	# Make the JSON data
+	message['cipher'] = encrypted_message
+	message['datetime'] = date_now
 	stringify = json.dumps(message, indent=2)
-	client.publish("AES", stringify)
-	print("Plaintext\t: ", rand)
-	print("Encrypted\t: ", msg)
-	print("Just published a message to topic AES at "+ now)
+
+	# Publishing the data
+	publish('AES', stringify)
+
+	# Displaying the data
+	prints(plaintext, encrypted_message, date_now)
+
+# Record the finished time
 stop = timeit.default_timer()
-lama_enkripsi = stop - start
-print("Waktu akumulasi : "+str(lama_enkripsi))
+encryption_duration = stop - start
+print("Waktu akumulasi : "+str(encryption_duration))

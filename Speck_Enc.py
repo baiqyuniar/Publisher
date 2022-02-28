@@ -1,4 +1,3 @@
-from __future__ import print_function
 from random import randint
 from time import sleep
 import paho.mqtt.client as mqtt
@@ -6,7 +5,8 @@ import timeit
 from datetime import datetime
 import json
 
-mqttBroker = "192.168.8.171"
+#MQTT
+mqttBroker = "34.101.187.83"
 client = mqtt.Client("Speck Publisher")
 client.connect(mqttBroker)
 
@@ -128,6 +128,7 @@ class SpeckCipher(object):
         return ciphertext
 
     def encrypt_round(self, x, y, k):
+
         """Complete One Round of Feistel Operation"""
         rs_x = ((x << (self.word_size - self.alpha_shift)) + (x >> self.alpha_shift)) & self.mod_mask
 
@@ -172,31 +173,53 @@ class SpeckCipher(object):
                 raise
         return self.iv
 
-def pencatatan(i, waktu):
-    f = open('publish_speck.csv', 'a')
-    f.write("Message ke-" + i + ";" +waktu + "\n")
+def publish(topic, message):
+	client.publish(topic, message)
 
-# Mencatat waktu mulai
+def prints(plaintext, encrypted_message, date_now):
+	print("Plaintext\t: ", plaintext)
+	print("Encrypted\t: ", encrypted_message)
+	print("Length\t\t: ", len(encrypted_message), "Bytes")
+	print("Just published a message to topic SPECK at "+ date_now)
+	print("\n")
+
+def pencatatan(i, date_now, plaintext, encrypted_message):
+    f = open('Publish_Speck.csv', 'a')
+    f.write("Message ke-" + i + ";" + str(plaintext) + ";" + encrypted_message + ";" + date_now + "\n")
+
+# Record the start time
 start = timeit.default_timer()
 
-key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
-cipher = SpeckCipher(key, 256, 128, 'CBC', 0xff)
+#key = 0x1f1e1d1c1b1a19181716151413121110
+key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
+#key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
+#cipher = SpeckCipher(key, 128, 128, 'ECB')
+cipher = SpeckCipher(key, 192, 128, 'CBC', 0x123456789ABCDEF0)
 message ={}
-for i in range(100):
-    mess = int('{:10}'.format(randint (60,100)))
-    print("Pesan yang dikirim\t: ", mess)
-    speck = cipher.encrypt(mess)
-    now = str(datetime.now().microsecond)
-    pencatatan(str(i), now)
-    message['cipher'] = speck
-    message['datetime'] = now
-    stringify = json.dumps(message, indent=2)
-    client.publish("SPECK", stringify)
-    print("Encrypted\t\t: ", hex(speck))
-    print("Just published a message to topic SIMON at "+ now)
-    # sleep(3)
 
-# Mencatat waktu selesai
+for i in range(10):
+    # Creating random integer as plaintext
+    plaintext = randint (60,100)
+
+    # Encrypting the plaintext
+    encrypted_message = str(hex(cipher.encrypt(plaintext)))[2:]
+    date_now = str(datetime.now().timestamp())
+
+    # Make the data record
+    pencatatan(str(i), date_now, plaintext, encrypted_message)
+
+    # Make the JOSN data
+    message['cipher'] = encrypted_message
+    message['datetime'] = date_now
+    stringify = json.dumps(message, indent=2)
+
+    # Publishing the data
+    publish("SPECK", stringify)
+
+    # Displaying the data
+    prints(plaintext, encrypted_message, date_now)
+
+# Record the finished time
 stop = timeit.default_timer()
-lama_enkripsi = stop - start
-print("Waktu akumulasi : "+str(lama_enkripsi))
+encryption_duration = stop - start
+print("Waktu akumulasi : "+str(encryption_duration))
