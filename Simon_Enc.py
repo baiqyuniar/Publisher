@@ -1,4 +1,3 @@
-from __future__ import print_function
 from random import randint
 from time import sleep
 from collections import deque
@@ -220,35 +219,53 @@ class SimonCipher(object):
                 raise
         return self.iv
 
-def pencatatan(i, waktu):
-    f = open('publish_Simon.csv', 'a')
-    f.write("Message ke-" + i + ";" + str(mess) + ";" + simon + ";" + waktu + "\n")
+def publish(topic, message):
+	client.publish(topic, message)
 
-# Mencatat waktu mulai
+def prints(plaintext, encrypted_message, date_now):
+	print("Plaintext\t: ", plaintext)
+	print("Encrypted\t: ", encrypted_message)
+	print("Length\t\t: ", len(encrypted_message), "Bytes")
+	print("Just published a message to topic SIMON at "+ date_now)
+	print("\n")
+
+def pencatatan(i, date_now, plaintext, encrypted_message):
+    f = open('Publish_Simon.csv', 'a')
+    f.write("Message ke-" + i + ";" + str(plaintext) + ";" + encrypted_message + ";" + date_now + "\n")
+
+# Record the start time
 start = timeit.default_timer()
+
 #key = 0x1f1e1d1c1b1a19181716151413121110
 key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
 #key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
 cipher = SimonCipher(key, 192, 128, 'ECB')
 #cipher = SimonCipher(key, 128, 128, 'CBC', 0x123456789ABCDEF0)
 message ={}
+
 for i in range(10):
-    mess = randint (60,100)
-    print("Plaintext\t: ", mess)
-    simon = str(hex(cipher.encrypt(mess)))[2:]
-    now = str(datetime.now().timestamp())
-    pencatatan(str(i), now)
-    message['cipher'] = simon
-    message['datetime'] = now
+    # Creating random integer as paintext
+    plaintext = randint (60,100)
+
+    # Encrypting the plaintext
+    encrypted_message = str(hex(cipher.encrypt(plaintext)))[2:]
+    date_now = str(datetime.now().timestamp())
+
+    # Make the data record
+    pencatatan(str(i), date_now, plaintext, encrypted_message)
+
+    # Make the JOSN data
+    message['cipher'] = encrypted_message
+    message['datetime'] = date_now
     stringify = json.dumps(message, indent=2)
-    client.publish("SIMON", stringify)
 
-    print("Encrypted\t: ",simon)
-    print("Length\t\t: ", len(simon), "Bytes")
-    print("Just published a message to topic SIMON at "+ now)
+    # Publishing the data
+    publish("SIMON", stringify)
 
+    # Displaying the data
+    prints(plaintext, encrypted_message, date_now)
 
-# Mencatat waktu selesai
+# Record the finished time
 stop = timeit.default_timer()
-lama_enkripsi = stop - start
-print("Waktu akumulasi : "+str(lama_enkripsi))
+encryption_duration = stop - start
+print("Waktu akumulasi : "+str(encryption_duration))

@@ -1,19 +1,18 @@
-from typing import Type
 import Cryptodome.Cipher.AES
 import Cryptodome.Random
 import base64
 import binascii
 from random import randint
 from time import sleep, time
-# import paho.mqtt.client as mqtt
+import paho.mqtt.client as mqtt
 import timeit
 from datetime import datetime
 import json
 
 # MQTT
-# mqttBroker = "34.101.187.83"
-# client = mqtt.Client('AES Publisher')
-# client.connect(mqttBroker)
+mqttBroker = "34.101.187.83"
+client = mqtt.Client('AES Publisher')
+client.connect(mqttBroker)
 
 class Cipher_AES:
 	pad_default = lambda x, y: x + (y - len(x) % y) * " ".encode("utf-8")
@@ -81,38 +80,61 @@ class Cipher_AES:
 		else:
 			return Cipher_AES.pad_user_defined(text, 16,  method)
 
-def main2(msg):
+def publish(topic, message):
+	client.publish(topic, message)
+
+
+def prints(plaintext, encrypted_message, date_now):
+	print("Plaintext\t: ", plaintext)
+	print("Encrypted\t: ", encrypted_message)
+	print("Length\t\t: ", len(encrypted_message), "Bytes")
+	print("Just published a message to topic AES at "+ date_now)
+	print("\n")
+
+
+def main(plaintext):
 	key = 'Mu8weQyDvq1HlAzN'
 #	key = 'Mu8weQyDvq1HlAzN7fjY026B'
 #	key = 'Mu8weQyDvq1HlAzN7fjY026Bjeu768db'
 	iv = 'HIwu5283JGHsi76H'
-	text = msg
+	text = plaintext
 	cipher_method = "MODE_ECB"
 	pad_method = "PKCS5Padding"
 	code_method = "hex"
 	cipher_text = Cipher_AES(key, iv).encrypt(text, cipher_method, pad_method, code_method)
 	return cipher_text.replace('\n', '')
 
-def pencatatan(i, waktu):
-     f = open('publish_AES.csv', 'a')
-     f.write("Message ke-" + i + ";" + rand + ";" + msg + ";" + waktu + "\n")
+def pencatatan(i, date_now, plaintext, encrypted_message):
+     f = open('Publish_AES.csv', 'a')
+     f.write("Message ke-" + i + ";" + plaintext + ";" + encrypted_message + ";" + date_now + "\n")
 
- # Mencatat waktu mulai
+# Record the start time
 start = timeit.default_timer()
 message ={}
+
 for i in range(10):
-	rand = str(randint(60,100))
-	msg = main2(rand)
-	now = str(datetime.now().timestamp())
-	pencatatan(str(i), now)
-	message['cipher'] = msg
-	message['datetime'] = now
+	# Creating random integer as plaintext
+	plaintext = str(randint(60,100))
+
+	# Encrypting the plaintext
+	encrypted_message = main(plaintext)
+	date_now = str(datetime.now().timestamp())
+
+	# Make the data record
+	pencatatan(str(i), date_now, plaintext, encrypted_message)
+
+	# Make the JSON data
+	message['cipher'] = encrypted_message
+	message['datetime'] = date_now
 	stringify = json.dumps(message, indent=2)
-	# client.publish('AES', stringify)
-	print("Plaintext\t: ", rand)
-	print("Encrypted\t: ", msg)
-	print("Length\t\t: ", len(msg), "Bytes")
-	print("Just published a message to topic AES at "+ now)
+
+	# Publishing the data
+	publish('AES', stringify)
+
+	# Displaying the data
+	prints(plaintext, encrypted_message, date_now)
+
+# Record the finished time
 stop = timeit.default_timer()
-lama_enkripsi = stop - start
-print("Waktu akumulasi : "+str(lama_enkripsi))
+encryption_duration = stop - start
+print("Waktu akumulasi : "+str(encryption_duration))
