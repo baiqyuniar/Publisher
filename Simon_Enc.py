@@ -222,7 +222,7 @@ class SimonCipher(object):
 
 def pencatatan(i, waktu):
     f = open('publish_Simon.csv', 'a')
-    f.write("Message ke-" + i + ";" + str(mess) + ";" + hex(simon) + ";" + waktu + "\n")
+    f.write("Message ke-" + i + ";" + str(mess) + ";" + simon + ";" + waktu + "\n")
 
 # Mencatat waktu mulai
 start = timeit.default_timer()
@@ -232,17 +232,19 @@ key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
 cipher = SimonCipher(key, 192, 128, 'ECB')
 #cipher = SimonCipher(key, 128, 128, 'CBC', 0x123456789ABCDEF0)
 message ={}
-for i in range(10000):
+for i in range(10):
     mess = randint (60,100)
     print("Plaintext\t: ", mess)
-    simon = cipher.encrypt(mess)
+    simon = str(hex(cipher.encrypt(mess)))[2:]
     now = str(datetime.now().timestamp())
     pencatatan(str(i), now)
-    message['cipher'] = hex(simon)
+    message['cipher'] = simon
     message['datetime'] = now
     stringify = json.dumps(message, indent=2)
     client.publish("SIMON", stringify)
-    print("Encrypted\t: ",hex(simon))
+
+    print("Encrypted\t: ",simon)
+    print("Length\t\t: ", len(simon), "Bytes")
     print("Just published a message to topic SIMON at "+ now)
 
 

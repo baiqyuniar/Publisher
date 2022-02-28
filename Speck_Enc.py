@@ -176,7 +176,7 @@ class SpeckCipher(object):
 
 def pencatatan(i, waktu):
     f = open('publish_Speck.csv', 'a')
-    f.write("Message ke-" + i + ";" + str(mess) + ";" + hex(speck) + ";" + waktu + "\n")
+    f.write("Message ke-" + i + ";" + str(mess) + ";" + speck + ";" + waktu + "\n")
 
 # Mencatat waktu mulai
 start = timeit.default_timer()
@@ -187,17 +187,19 @@ key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
 #cipher = SpeckCipher(key, 128, 128, 'ECB')
 cipher = SpeckCipher(key, 192, 128, 'CBC', 0x123456789ABCDEF0)
 message ={}
-for i in range(10000):
+for i in range(10):
     mess = randint (60,100)
     print("Plaintext\t: ", mess)
-    speck = cipher.encrypt(mess)
+    speck = str(hex(cipher.encrypt(mess)))[2:]
     now = str(datetime.now().timestamp())
     pencatatan(str(i), now)
-    message['cipher'] = hex(speck)
+    message['cipher'] = speck
     message['datetime'] = now
     stringify = json.dumps(message, indent=2)
     client.publish("SPECK", stringify)
-    print("Encrypted\t: ", hex(speck))
+
+    print("Encrypted\t: ", speck)
+    print("Length\t\t: ", len(speck), "Bytes")
     print("Just published a message to topic SPECK at "+ now)
 
 

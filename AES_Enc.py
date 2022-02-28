@@ -1,18 +1,19 @@
+from typing import Type
 import Cryptodome.Cipher.AES
 import Cryptodome.Random
 import base64
 import binascii
 from random import randint
 from time import sleep, time
-import paho.mqtt.client as mqtt
+# import paho.mqtt.client as mqtt
 import timeit
 from datetime import datetime
 import json
 
 # MQTT
-mqttBroker = "34.101.187.83"
-client = mqtt.Client('AES Publisher')
-client.connect(mqttBroker)
+# mqttBroker = "34.101.187.83"
+# client = mqtt.Client('AES Publisher')
+# client.connect(mqttBroker)
 
 class Cipher_AES:
 	pad_default = lambda x, y: x + (y - len(x) % y) * " ".encode("utf-8")
@@ -99,7 +100,7 @@ def pencatatan(i, waktu):
  # Mencatat waktu mulai
 start = timeit.default_timer()
 message ={}
-for i in range(10000):
+for i in range(10):
 	rand = str(randint(60,100))
 	msg = main2(rand)
 	now = str(datetime.now().timestamp())
@@ -107,9 +108,10 @@ for i in range(10000):
 	message['cipher'] = msg
 	message['datetime'] = now
 	stringify = json.dumps(message, indent=2)
-	client.publish('AES', stringify)
+	# client.publish('AES', stringify)
 	print("Plaintext\t: ", rand)
 	print("Encrypted\t: ", msg)
+	print("Length\t\t: ", len(msg), "Bytes")
 	print("Just published a message to topic AES at "+ now)
 stop = timeit.default_timer()
 lama_enkripsi = stop - start
