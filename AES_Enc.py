@@ -58,27 +58,27 @@ class Cipher_AES:
 		else:
 			return cipher_text.decode("utf-8").rstrip()
 
-	#text verify for AES-192
+	#text verify 
 	def text_verify(self, text, method):
-		while len(text) > 16:
-			text_slice = text[:16]
-			text = text[16:]
+		while len(text) > 32:
+			text_slice = text[:32]
+			text = text[32:]
 			yield text_slice
 		else:
-			if len(text) == 16:
+			if len(text) == 32:
 				yield text
 			else:
 				yield self.pad_method(text, method)
 
 
-	#Pad method AES-192
+	#Pad method
 	def pad_method(self, text, method):
 		if method == "":
-			return Cipher_AES.pad_default(text, 16)
+			return Cipher_AES.pad_default(text, 32)
 		elif method == "PKCS5Padding":
-			return Cipher_AES.pad_pkcs5(text, 16)
+			return Cipher_AES.pad_pkcs5(text, 32)
 		else:
-			return Cipher_AES.pad_user_defined(text, 16,  method)
+			return Cipher_AES.pad_user_defined(text, 32,  method)
 
 def publish(topic, message):
 	client.publish(topic, message)
@@ -93,9 +93,9 @@ def prints(plaintext, encrypted_message, date_now):
 
 
 def main(plaintext):
-	key = 'Mu8weQyDvq1HlAzN'
+#	key = 'Mu8weQyDvq1HlAzN'
 #	key = 'Mu8weQyDvq1HlAzN7fjY026B'
-#	key = 'Mu8weQyDvq1HlAzN7fjY026Bjeu768db'
+	key = 'Mu8weQyDvq1HlAzN7fjY026Bjeu768db'
 	iv = 'HIwu5283JGHsi76H'
 	text = plaintext
 	cipher_method = "MODE_ECB"
@@ -112,7 +112,7 @@ def pencatatan(i, date_now, plaintext, encrypted_message):
 start = timeit.default_timer()
 message ={}
 
-for i in range(10):
+for i in range(10000):
 	# Creating random integer as plaintext
 	plaintext = str(randint(60,100))
 
