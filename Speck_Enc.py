@@ -214,7 +214,7 @@ for i in range(10):
     stringify = json.dumps(message, indent=2)
 
     # Publishing the data
-    publish("SPECK", stringify)
+    publish("SPK", stringify)
 
     # Displaying the data
     prints(plaintext, encrypted_message, date_now)

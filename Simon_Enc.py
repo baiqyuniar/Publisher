@@ -260,7 +260,7 @@ for i in range(10):
     stringify = json.dumps(message, indent=2)
 
     # Publishing the data
-    publish("SIMON", stringify)
+    publish("SIM", stringify)
 
     # Displaying the data
     prints(plaintext, encrypted_message, date_now)
